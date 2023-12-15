@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokédex</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+
+    .pokedex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: flex-start;
+    }
+
+    .pokemon-card {
+      width: 200px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .pokemon-image {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="pokedex"></div>
+  
+  <script>
+    let offset = 0;
+    let isLoading = false;
+    let totalCount = null;
+    const pokemonLimit = 12;
+
+    const loadPokemons = () => {
+      if (!isLoading && (totalCount === null || document.body.scrollHeight - window.innerHeight <= window.scrollY + 100)) {
+        isLoading = true;
+        fetch(`https://pokeapi.co/api/v2/pokemon?limit=${pokemonLimit}&offset=${offset}`)
+          .then((response) => response.json())
+          .then((data) => {
+            isLoading = false;
+            totalCount = data.count;
+            const pokedex = document.querySelector('.pokedex');
+            data.results.forEach((pokemon) => {
+              const pokemonCard = document.createElement('div');
+              pokemonCard.classList.add('pokemon-card');
+              pokemonCard.innerHTML = `
+                <h2>${pokemon.name}</h2>
+                <img class="pokemon-image" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${offset + 1}.png" alt="${pokemon.name}">
+                <p>#${offset + 1}</p>
+                <p>Type: Details here</p>
+              `;
+              pokedex.appendChild(pokemonCard);
+              offset++;
+            });
+          });
+      }
+    };
+
+    window.addEventListener('scroll', loadPokemons);
+
+    loadPokemons();
+  </script>
+</body>
+</html>
